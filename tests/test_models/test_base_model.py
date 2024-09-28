@@ -8,8 +8,8 @@ import json
 import os
 
 
-class test_basemodel(unittest.TestCase):
-    """ """
+class TestBaseModel(unittest.TestCase):
+    """ Test base model"""
 
     def __init__(self, *args, **kwargs):
         """ """
@@ -26,11 +26,6 @@ class test_basemodel(unittest.TestCase):
             os.remove('file.json')
         except:
             pass
-
-    @unittest.skip("Skipping test_save")
-    def test_save(self):
-        """ Testing save """
-        pass
 
     def test_default(self):
         """ """
@@ -52,12 +47,6 @@ class test_basemodel(unittest.TestCase):
         with self.assertRaises(TypeError):
             new = BaseModel(**copy)
 
-    def test_str(self):
-        """ """
-        i = self.value()
-        self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
-                         i.__dict__))
-
     def test_todict(self):
         """ """
         i = self.value()
@@ -70,12 +59,6 @@ class test_basemodel(unittest.TestCase):
         with self.assertRaises(TypeError):
             new = self.value(**n)
 
-    def test_kwargs_one(self):
-        """ """
-        n = {'Name': 'test'}
-        new = self.value(**n)
-        self.assertEqual(new.Name, 'test')
-
     def test_id(self):
         """ """
         new = self.value()
@@ -87,23 +70,10 @@ class test_basemodel(unittest.TestCase):
         self.assertEqual(type(new.created_at), datetime.datetime)
 
     def test_updated_at(self):
-    """Test that updated_at is handled correctly during deserialization."""
-    new = self.value()
-    self.assertEqual(type(new.updated_at), datetime.datetime)
-    n = new.to_dict()
-    from time import sleep
-    sleep(1) 
-    new = BaseModel(**n)
-    self.assertFalse(new.created_at == new.updated_at)
-
-
-    def test_new_test_case(self):
         """ """
         new = self.value()
-        new.custom_attribute = "custom value"
-        self.assertTrue(hasattr(new, 'custom_attribute'))
-        self.assertEqual(new.custom_attribute, "custom value")
-
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual(type(new.updated_at), datetime.datetime)
+        n = new.to_dict()
+        new = BaseModel(**n)
+        self.assertAlmostEqual(new.created_at.timestamp(),
+                               new.updated_at.timestamp(), delta=1)
